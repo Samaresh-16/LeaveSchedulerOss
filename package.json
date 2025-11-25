@@ -1,0 +1,16 @@
+{
+	"name": "leave-scheduler-root",
+	"scripts": {
+		"init:mysql": "brew install mysql",
+		"init:backend": "cd LeaveScheduler && mvn clean install -DskipTests",
+		"init:frontend": "cd leave-scheduler-frontend && npm i",
+		"start:mysql": "brew services start mysql",
+		"start:backend": "cd LeaveScheduler && mvn install -DskipTests && mvn spring-boot:run -DskipTests",
+		"start:frontend": "cd leave-scheduler-frontend && npm ci && npm run dev",
+		"init:all": "npm run init:mysql && npm run init:backend && npm run init:frontend",
+		"start:all": "run-p -s start:mysql start:backend start:frontend"
+	},
+	"devDependencies": {
+		"npm-run-all": "^4.1.5"
+	}
+}
