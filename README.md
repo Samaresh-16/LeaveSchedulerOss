@@ -157,16 +157,20 @@ Thank you for contributing to LeaveSchedulerOss!
 
 <p align="left">
 
-<a href="https://github.com/contributor1">
+<a href="https://github.com/MainakMukherjee01/">
   <img src="https://avatars.githubusercontent.com/u/131389864?v=4" width="75" height="75" style="border-radius: 50%; margin-right: 10px;" />
 </a>
-
-<a href="https://github.com/contributor2">
-  <img src="https://github.com/contributor2.png" width="75" height="75" style="border-radius: 50%; margin-right: 10px;" />
+<a href="https://github.com/Samaresh-16">
+  <img src="https://avatars.githubusercontent.com/u/85400714?v=4" width="75" height="75" style="border-radius: 50%; margin-right: 10px;" />
 </a>
-
-<a href="https://github.com/contributor3">
-  <img src="https://github.com/contributor3.png" width="75" height="75" style="border-radius: 50%; margin-right: 10px;" />
+<a href="https://github.com/sampritibanerjee">
+  <img src="https://avatars.githubusercontent.com/u/88034572?v=4" width="75" height="75" style="border-radius: 50%; margin-right: 10px;" />
+</a>
+<a href="https://github.com/hrishikeshrc02">
+  <img src="https://avatars.githubusercontent.com/u/129333612?v=4" width="75" height="75" style="border-radius: 50%; margin-right: 10px;" />
+</a>
+<a href="https://github.com/Asmita-coder-ux">
+  <img src="https://avatars.githubusercontent.com/u/129609862?v=4" width="75" height="75" style="border-radius: 50%; margin-right: 10px;" />
 </a>
 
 </p>
