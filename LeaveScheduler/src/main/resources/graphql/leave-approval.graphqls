@@ -1,0 +1,11 @@
+type Query {
+    pendingLeaveApplications: [String!]!
+    approvedLeaveApplications: [String!]!
+    rejectedLeaveApplications: [String!]!
+}
+
+type Mutation {
+    approveLeave(id: ID!, request: LeaveApprovalRequest!): String!
+    rejectLeave(id: ID!, request: LeaveApprovalRequest!): String!
+}
+
