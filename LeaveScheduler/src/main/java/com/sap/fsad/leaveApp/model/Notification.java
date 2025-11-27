@@ -1,5 +1,6 @@
 package com.sap.fsad.leaveApp.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.sap.fsad.leaveApp.model.enums.NotificationType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
+@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 public class Notification {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,6 +29,7 @@ public class Notification {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnoreProperties({"notifications", "leaveRequests", "password", "resetPasswordToken"})
     private User user;
 
     @NotBlank

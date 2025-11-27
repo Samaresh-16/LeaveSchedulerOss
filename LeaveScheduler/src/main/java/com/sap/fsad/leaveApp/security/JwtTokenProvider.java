@@ -13,7 +13,9 @@ import org.springframework.stereotype.Component;
 
 import com.sap.fsad.leaveApp.repository.BlacklistTokenRepository;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
+import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -100,7 +102,7 @@ public class JwtTokenProvider {
     public boolean validateToken(String authToken) {
         try {
 
-            if (blacklistTokenRepository.existsByToken(authToken)) {
+            if (blacklistTokenRepository.existsByToken(hashToken(authToken))) {
                 return false;
             }
             Jwts.parserBuilder()
@@ -111,5 +113,23 @@ public class JwtTokenProvider {
         } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
+    }
+
+    private String hashToken(String token) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(token.getBytes(StandardCharsets.UTF_8));
+            return bytesToHex(hash);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to hash token", e);
+        }
+    }
+
+    private String bytesToHex(byte[] bytes) {
+        StringBuilder result = new StringBuilder();
+        for (byte b : bytes) {
+            result.append(String.format("%02x", b));
+        }
+        return result.toString();
     }
 }
