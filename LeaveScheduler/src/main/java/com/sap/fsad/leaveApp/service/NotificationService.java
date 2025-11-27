@@ -1,5 +1,12 @@
 package com.sap.fsad.leaveApp.service;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.sap.fsad.leaveApp.exception.ResourceNotFoundException;
 import com.sap.fsad.leaveApp.model.LeaveApplication;
 import com.sap.fsad.leaveApp.model.Notification;
@@ -7,12 +14,6 @@ import com.sap.fsad.leaveApp.model.User;
 import com.sap.fsad.leaveApp.model.enums.LeaveType;
 import com.sap.fsad.leaveApp.model.enums.NotificationType;
 import com.sap.fsad.leaveApp.repository.NotificationRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 public class NotificationService {
@@ -39,7 +40,9 @@ public class NotificationService {
         notification.setCreatedAt(LocalDateTime.now());
         notification.setUpdatedAt(LocalDateTime.now());
 
-        return notificationRepository.save(notification);
+        Notification savedNotification = notificationRepository.save(notification);
+
+        return savedNotification;
     }
 
     /**
@@ -163,19 +166,13 @@ public class NotificationService {
      * Mark notification as read
      */
     @Transactional
-    public Notification markNotificationAsRead(Long id) {
-        User currentUser = userService.getCurrentUser();
-        Notification notification = notificationRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Notification", "id", id));
-
-        // Ensure the notification belongs to the current user
-        if (!notification.getUser().getId().equals(currentUser.getId())) {
-            throw new ResourceNotFoundException("Notification", "id", id);
-        }
+    public void markNotificationAsRead(Long notificationId) {
+        Notification notification = notificationRepository.findById(notificationId)
+                .orElseThrow(() -> new ResourceNotFoundException("Notification not found"));
 
         notification.setIsRead(true);
         notification.setUpdatedAt(LocalDateTime.now());
-        return notificationRepository.save(notification);
+        notificationRepository.save(notification);
     }
 
     /**
@@ -184,13 +181,13 @@ public class NotificationService {
     @Transactional
     public void markAllNotificationsAsRead() {
         User currentUser = userService.getCurrentUser();
-        List<Notification> unreadNotifications = notificationRepository.findByUserAndIsReadFalse(currentUser);
+        List<Notification> notifications = notificationRepository.findByUserAndIsReadFalse(currentUser);
 
-        for (Notification notification : unreadNotifications) {
+        for (Notification notification : notifications) {
             notification.setIsRead(true);
             notification.setUpdatedAt(LocalDateTime.now());
         }
 
-        notificationRepository.saveAll(unreadNotifications);
+        notificationRepository.saveAll(notifications);
     }
 }

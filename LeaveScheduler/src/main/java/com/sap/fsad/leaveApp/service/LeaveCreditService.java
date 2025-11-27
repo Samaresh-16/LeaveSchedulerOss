@@ -1,24 +1,25 @@
 package com.sap.fsad.leaveApp.service;
 
-import com.sap.fsad.leaveApp.dto.response.ApiResponse;
-import com.sap.fsad.leaveApp.model.LeaveBalance;
-import com.sap.fsad.leaveApp.model.LeavePolicy;
-import com.sap.fsad.leaveApp.model.User;
-import com.sap.fsad.leaveApp.model.enums.UserRole;
-import com.sap.fsad.leaveApp.model.enums.LeaveType;
-import com.sap.fsad.leaveApp.repository.LeaveBalanceRepository;
-import com.sap.fsad.leaveApp.repository.LeavePolicyRepository;
-import com.sap.fsad.leaveApp.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.sap.fsad.leaveApp.dto.response.ApiResponse;
+import com.sap.fsad.leaveApp.model.LeaveBalance;
+import com.sap.fsad.leaveApp.model.LeavePolicy;
+import com.sap.fsad.leaveApp.model.User;
+import com.sap.fsad.leaveApp.model.enums.LeaveType;
+import com.sap.fsad.leaveApp.model.enums.UserRole;
+import com.sap.fsad.leaveApp.repository.LeaveBalanceRepository;
+import com.sap.fsad.leaveApp.repository.LeavePolicyRepository;
+import com.sap.fsad.leaveApp.repository.UserRepository;
 
 @Service
 public class LeaveCreditService {
@@ -192,7 +193,8 @@ public class LeaveCreditService {
                 notificationService.createSpecialLeaveCreditedNotification(user, leaveType, amount, reason);
                 emailService.sendSpecialLeaveCreditEmail(user, leaveType, amount, reason);
 
-                responses.add(new ApiResponse(true, "Special leave credited for user: " + user.getFullName()));
+                responses.add(
+                        new ApiResponse(true, "Special leave credited successfully for user: " + user.getFullName()));
             } catch (Exception e) {
                 responses.add(new ApiResponse(false,
                         "Failed to credit special leave for user ID: " + userId + ". Error: " + e.getMessage()));

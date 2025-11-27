@@ -1,25 +1,27 @@
 package com.sap.fsad.leaveApp.service;
 
-import com.sap.fsad.leaveApp.model.LeaveApplication;
-import com.sap.fsad.leaveApp.model.User;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.sap.fsad.leaveApp.model.enums.LeaveType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
+import com.sap.fsad.leaveApp.exception.EmailSendException;
+import com.sap.fsad.leaveApp.model.LeaveApplication;
+import com.sap.fsad.leaveApp.model.User;
+import com.sap.fsad.leaveApp.model.enums.LeaveType;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import java.util.HashMap;
-import java.util.Map;
 
 @Service
 public class EmailService {
@@ -243,12 +245,18 @@ public class EmailService {
      */
     @Retryable(value = MessagingException.class, maxAttempts = 3, backoff = @Backoff(delay = 20000))
     public void sendEmail(String to, String subject, String htmlContent) throws MessagingException {
-        MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-        helper.setTo(to);
-        helper.setSubject(subject);
-        helper.setText(htmlContent, true);
-        mailSender.send(message);
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            helper.setTo(to);
+            helper.setSubject(subject);
+            helper.setText(htmlContent, true);
+            mailSender.send(message);
+        } catch (MessagingException e) {
+            throw e; // retry will handle
+        } catch (Exception e) {
+            throw new EmailSendException("Unexpected failure sending email to " + to, e);
+        }
     }
 
     @Recover
