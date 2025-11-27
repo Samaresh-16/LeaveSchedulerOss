@@ -87,24 +87,26 @@ To start the application:
 
 Here's a quick guide on how to use LeaveSchedulerOss:
 
-1. **Login**: Use your credentials to log in to the system.
+1. Before login the user should be **Registered**. 
+For Admin/Manager roles contact the admin. For dev testing use User Master (for creds contact any of the repo owners).
+2. **Login**: Use your credentials to log in to the system.
 
-2. **Request Leave**:
+3. **Request Leave**:
    - Navigate to the "Apply for Leave" section.
    - Select the leave type, start date, end date, and provide a reason.
    - Submit your request.
 
-3. **View Leave Balance**: Check your current leave balance on the dashboard.
+4. **View Leave Balance**: Check your current leave balance on the dashboard.
 
-4. **Track Leave Status**: Monitor the status of your leave requests in the "My Leaves" section.
+5. **Track Leave Status**: Monitor the status of your leave requests in the "My Leaves" section.
 
-5. **For Managers**:
+6. **For Managers**:
    - Access the "Approve Leaves" section to review and act on leave requests.
    - Use the "Team Calendar" to view team members' schedules.
 
-6. **Notifications**: Receive email notifications for leave request updates.
+7. **Notifications**: Receive email notifications for leave request updates.
 
-7. **Reports**: HR and management can generate leave reports from the "Reports" section.
+8. **Reports**: HR and management can generate leave reports from the "Reports" section.
 
 For more detailed instructions, please refer to our [User Guide](link-to-user-guide).
 
@@ -179,7 +181,7 @@ Want to be featured here?
 📌 Contribute to the project and open a pull request!
 To see the full list of contributors, check out the [contributors page](https://github.com/Samaresh-16/LeaveSchedulerOss/graphs/contributors).
 
-Want to be on this list? See our [Contributing](#contributing) section to get started!
+
 ---
 ## License
 
@@ -188,27 +190,39 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 ## Screenshots
 
 Here are some screenshots demonstrating key features of LeaveSchedulerOss:
+### Employee Dashboard
 
-![Dashboard](https://placeholder.com/dashboard.png)
-*Employee Dashboard*
+<p align="center">
+  <img 
+    src="https://github.com/user-attachments/assets/8258d218-1d23-4560-8e98-31412ae41592" 
+    alt="Employee Dashboard"
+    width="80%"
+  />
+</p>
 
-![Leave Request](https://placeholder.com/leave-request.png)
-*Leave Request Form*
+### Leave Request Form
 
-![Manager Approval](https://placeholder.com/manager-approval.png)
-*Manager Approval Interface*
+<p align="center">
+  <img 
+    src="https://github.com/user-attachments/assets/0f25bcf6-78f4-47e8-9120-2444d0cb5214" 
+    alt="Leave Request Form"
+    width="300"
+    height="500"
+  />
+</p>
 
-(Note: Replace these placeholder URLs with actual screenshot URLs once they are available)
-
-
-
-To see the full list of contributors, check out the [contributors page](https://github.com/Samaresh-16/LeaveSchedulerOss/graphs/contributors).
-
-Want to be on this list? See our [Contributing](#contributing) section to get started!
+### Manager Approval Interface
+<p align="center">
+  <img 
+    src="https://github.com/user-attachments/assets/665b0e5c-87ee-4bb2-87b2-a048d5d814ff" 
+    alt="Leave Request Form"
+    width="80%"
+  />
+</p>
 
 ## Testimonials
 
-[Add user testimonials or quotes about the project here]
+will be added soon :)
 
 ## Important Links
 
