@@ -32,4 +32,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findByIsActiveTrue();
 
     Optional<User> findByResetToken(String resetToken);
+
+    @Query("SELECT u FROM User u LEFT JOIN FETCH u.roles LEFT JOIN FETCH u.manager")
+    List<User> findAllWithRoles();
+
+    @Query("SELECT u FROM User u LEFT JOIN FETCH u.roles LEFT JOIN FETCH u.manager WHERE u.manager.id = :managerId")
+    List<User> findByManagerIdWithRoles(@Param("managerId") Long managerId);
+    // ...existing code...
 }

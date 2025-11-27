@@ -1,9 +1,7 @@
 package com.sap.fsad.leaveApp.security;
 
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -12,7 +10,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.io.IOException;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -29,12 +30,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String requestURI = request.getRequestURI();
 
-        if (requestURI.startsWith("/h2-console") || requestURI.startsWith("/v3/api-docs")
+        if (requestURI.startsWith("/h2-console") || requestURI.startsWith(
+                "/robots933456.txt") || requestURI.startsWith("/v3/api-docs")
                 || requestURI.startsWith("/swagger-ui") || requestURI.startsWith("/api/auth/login")
                 || requestURI.startsWith("/api/auth/register")
                 || requestURI.startsWith("/api/auth/forgot-password")
                 || requestURI.startsWith("/api/auth/reset-password") || requestURI.startsWith("/favicon.ico")
-                || requestURI.equals("/")) {
+                || requestURI.equals("/") || requestURI.startsWith("/api/app-logs")
+                || requestURI.startsWith("/graphiql")) {
             filterChain.doFilter(request, response);
             return;
         }

@@ -1,8 +1,7 @@
 package com.sap.fsad.leaveApp.config;
 
-import com.sap.fsad.leaveApp.security.JwtAuthenticationFilter;
-import com.sap.fsad.leaveApp.security.RateLimitingFilter;
-import com.sap.fsad.leaveApp.security.UserDetailsServiceImpl;
+import java.util.Arrays;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,7 +21,9 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
+import com.sap.fsad.leaveApp.security.JwtAuthenticationFilter;
+import com.sap.fsad.leaveApp.security.RateLimitingFilter;
+import com.sap.fsad.leaveApp.security.UserDetailsServiceImpl;
 
 @Configuration
 @EnableWebSecurity
@@ -68,8 +69,13 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/").permitAll()
+                        .requestMatchers("/graphql").permitAll()
+                        .requestMatchers("/graphiql").permitAll()
+                        .requestMatchers("/robots933456.txt").permitAll()
                         .requestMatchers("/api/auth/logout").authenticated()
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/app-logs").permitAll()
+                        .requestMatchers("/api/app-logs/**").permitAll()
                         .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("/v3/api-docs/**").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
@@ -81,8 +87,8 @@ public class SecurityConfig {
 
         // Add JWT filter, but exclude /h2-console/**
         http
-            .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-            .addFilterBefore(rateLimitingFilter(), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(rateLimitingFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

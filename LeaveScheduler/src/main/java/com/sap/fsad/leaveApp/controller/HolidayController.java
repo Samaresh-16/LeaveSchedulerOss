@@ -1,18 +1,28 @@
 package com.sap.fsad.leaveApp.controller;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.sap.fsad.leaveApp.dto.response.ApiResponse;
+import com.sap.fsad.leaveApp.logging.LogOperation;
 import com.sap.fsad.leaveApp.model.Holiday;
 import com.sap.fsad.leaveApp.service.HolidayService;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/holidays")
@@ -26,11 +36,13 @@ public class HolidayController {
     @Operation(summary = "Create a new holiday (ADMIN only)")
     @PreAuthorize("hasRole('ADMIN')")
     @SecurityRequirement(name = "bearerAuth")
+    @LogOperation(value = "CREATE_HOLIDAY", entityType = "Holiday", async = false)
     public ResponseEntity<Holiday> createHoliday(@Valid @RequestBody Holiday holiday) {
         Holiday createdHoliday = holidayService.createHoliday(holiday);
         return ResponseEntity.ok(createdHoliday);
     }
 
+    @LogOperation(value = "CREATE_HOLIDAYS_BULK", entityType = "Holiday", async = false)
     @PostMapping("/bulk")
     @Operation(summary = "Create multiple holidays (ADMIN only)")
     @PreAuthorize("hasRole('ADMIN')")
@@ -40,6 +52,7 @@ public class HolidayController {
         return ResponseEntity.ok(createdHolidays);
     }
 
+    @LogOperation(value = "GET_ALL_HOLIDAYS", entityType = "Holiday")
     @GetMapping("/")
     @Operation(summary = "Get all holidays")
     @SecurityRequirement(name = "bearerAuth")
@@ -48,6 +61,7 @@ public class HolidayController {
         return ResponseEntity.ok(holidays);
     }
 
+    @LogOperation(value = "GET_HOLIDAY_BY_ID", entityType = "Holiday")
     @GetMapping("/{id:\\d+}")
     @Operation(summary = "Get holiday by ID")
     @SecurityRequirement(name = "bearerAuth")
@@ -56,6 +70,7 @@ public class HolidayController {
         return ResponseEntity.ok(holiday);
     }
 
+    @LogOperation(value = "GET_HOLIDAYS_BY_YEAR", entityType = "Holiday")
     @GetMapping("/year/{year}")
     @Operation(summary = "Get holidays by year")
     @SecurityRequirement(name = "bearerAuth")
@@ -64,6 +79,7 @@ public class HolidayController {
         return ResponseEntity.ok(holidays);
     }
 
+    @LogOperation(value = "GET_HOLIDAYS_BY_MONTH_YEAR", entityType = "Holiday")
     @GetMapping("/month/{month}/year/{year}")
     @Operation(summary = "Get holidays by month and year")
     @SecurityRequirement(name = "bearerAuth")
@@ -74,6 +90,7 @@ public class HolidayController {
         return ResponseEntity.ok(holidays);
     }
 
+    @LogOperation(value = "UPDATE_HOLIDAY", entityType = "Holiday", async = false)
     @PutMapping("/{id:\\d+}")
     @Operation(summary = "Update a holiday (ADMIN only)")
     @PreAuthorize("hasRole('ADMIN')")
@@ -89,11 +106,13 @@ public class HolidayController {
     @Operation(summary = "Delete a holiday (ADMIN only)")
     @PreAuthorize("hasRole('ADMIN')")
     @SecurityRequirement(name = "bearerAuth")
+    @LogOperation(value = "DELETE_HOLIDAY", entityType = "Holiday", async = false)
     public ResponseEntity<ApiResponse> deleteHoliday(@PathVariable Long id) {
         ApiResponse response = holidayService.deleteHoliday(id);
         return ResponseEntity.ok(response);
     }
 
+    @LogOperation(value = "GET_HOLIDAY_CALENDAR", entityType = "Holiday")
     @GetMapping("/calendar")
     @Operation(summary = "Get calendar view of holidays")
     @SecurityRequirement(name = "bearerAuth")

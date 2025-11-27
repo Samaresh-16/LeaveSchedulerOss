@@ -1,18 +1,23 @@
 package com.sap.fsad.leaveApp.controller;
 
-import com.sap.fsad.leaveApp.model.LeaveApplication;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.sap.fsad.leaveApp.logging.LogOperation;
 import com.sap.fsad.leaveApp.model.Holiday;
+import com.sap.fsad.leaveApp.model.LeaveApplication;
 import com.sap.fsad.leaveApp.service.ReportService;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/reports")
@@ -22,6 +27,7 @@ public class ReportController {
     @Autowired
     private ReportService reportService;
 
+    @LogOperation(value = "GET_LEAVE_USAGE_REPORT", entityType = "Report")
     @GetMapping("/leave-usage")
     @Operation(summary = "Get leave usage report")
     @SecurityRequirement(name = "bearerAuth")
@@ -30,6 +36,7 @@ public class ReportController {
         return ResponseEntity.ok(report);
     }
 
+    @LogOperation(value = "GET_PENDING_APPROVALS_REPORT", entityType = "Report")
     @GetMapping("/pending-approvals")
     @Operation(summary = "Get pending approvals report")
     @SecurityRequirement(name = "bearerAuth")
@@ -38,6 +45,7 @@ public class ReportController {
         return ResponseEntity.ok(report);
     }
 
+    @LogOperation(value = "GET_HOLIDAY_SCHEDULE_REPORT", entityType = "Report")
     @GetMapping("/holiday-schedule")
     @Operation(summary = "Get holiday schedule report")
     @SecurityRequirement(name = "bearerAuth")
@@ -46,6 +54,7 @@ public class ReportController {
         return ResponseEntity.ok(report);
     }
 
+    @LogOperation(value = "EXPORT_LEAVE_USAGE_EXCEL", entityType = "Report", async = false)
     @GetMapping("/leave-usage/export/excel")
     @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "Export leave usage report to Excel")
@@ -59,6 +68,7 @@ public class ReportController {
                 .body(excelData);
     }
 
+    @LogOperation(value = "EXPORT_LEAVE_USAGE_PDF", entityType = "Report", async = false)
     @GetMapping("/leave-usage/export/pdf")
     @Operation(summary = "Export leave usage report to PDF")
     @SecurityRequirement(name = "bearerAuth")

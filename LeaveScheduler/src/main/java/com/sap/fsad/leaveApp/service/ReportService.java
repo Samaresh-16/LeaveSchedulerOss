@@ -1,14 +1,6 @@
 package com.sap.fsad.leaveApp.service;
 
-import com.sap.fsad.leaveApp.model.LeaveApplication;
-import com.sap.fsad.leaveApp.model.enums.LeaveStatus;
-import com.itextpdf.io.source.ByteArrayOutputStream;
-import com.itextpdf.kernel.pdf.PdfWriter;
-import com.itextpdf.layout.Document;
-import com.itextpdf.layout.element.Paragraph;
-import com.sap.fsad.leaveApp.model.Holiday;
-import com.sap.fsad.leaveApp.repository.LeaveApplicationRepository;
-import com.sap.fsad.leaveApp.repository.HolidayRepository;
+import java.util.List;
 
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -17,7 +9,15 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import com.itextpdf.io.source.ByteArrayOutputStream;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.Paragraph;
+import com.sap.fsad.leaveApp.model.Holiday;
+import com.sap.fsad.leaveApp.model.LeaveApplication;
+import com.sap.fsad.leaveApp.model.enums.LeaveStatus;
+import com.sap.fsad.leaveApp.repository.HolidayRepository;
+import com.sap.fsad.leaveApp.repository.LeaveApplicationRepository;
 
 @Service
 public class ReportService {
@@ -32,21 +32,24 @@ public class ReportService {
      * Get leave usage report for all users
      */
     public List<LeaveApplication> getLeaveUsageReport() {
-        return leaveApplicationRepository.findAll();
+        List<LeaveApplication> report = leaveApplicationRepository.findAll();
+        return report;
     }
 
     /**
      * Get pending approvals report
      */
     public List<LeaveApplication> getPendingApprovalsReport() {
-        return leaveApplicationRepository.findByStatus(LeaveStatus.PENDING);
+        List<LeaveApplication> report = leaveApplicationRepository.findByStatus(LeaveStatus.PENDING);
+        return report;
     }
 
     /**
      * Get holiday schedule report
      */
     public List<Holiday> getHolidayScheduleReport() {
-        return holidayRepository.findAll();
+        List<Holiday> report = holidayRepository.findAll();
+        return report;
     }
 
     /**
@@ -78,6 +81,7 @@ public class ReportService {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         workbook.write(out);
         workbook.close();
+
         return out.toByteArray();
     }
 
@@ -98,6 +102,7 @@ public class ReportService {
         }
 
         document.close();
+
         return out.toByteArray();
     }
 }

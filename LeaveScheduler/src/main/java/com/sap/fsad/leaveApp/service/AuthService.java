@@ -1,11 +1,14 @@
 package com.sap.fsad.leaveApp.service;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -41,6 +44,9 @@ public class AuthService {
     private static final int MAX_FAILED_ATTEMPTS = 5;
     static final long LOCK_TIME_DURATION = 5 * 60 * 1000;
 
+    @Value("${FRONTEND_BASE_URI}")
+    private String frontendBaseUri;
+
     @Autowired
     private AuthenticationManager authenticationManager;
 
@@ -70,11 +76,29 @@ public class AuthService {
         String jwt = token.replace("Bearer ", "");
 
         BlacklistedToken blacklistedToken = new BlacklistedToken();
-        blacklistedToken.setToken(jwt);
+        blacklistedToken.setToken(hashToken(jwt));
         blacklistedToken.setExpiryDate(tokenProvider.getExpiryDateFromToken(jwt));
         blacklistTokenRepository.save(blacklistedToken);
 
         return new ApiResponse(true, "User logged out successfully");
+    }
+
+    private String hashToken(String token) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(token.getBytes(StandardCharsets.UTF_8));
+            return bytesToHex(hash);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to hash token", e);
+        }
+    }
+
+    private String bytesToHex(byte[] bytes) {
+        StringBuilder result = new StringBuilder();
+        for (byte b : bytes) {
+            result.append(String.format("%02x", b));
+        }
+        return result.toString();
     }
 
     /**
@@ -148,7 +172,11 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         user.setFullName(registerRequest.getFullName());
         user.setEmail(registerRequest.getEmail());
-        user.setRoles(registerRequest.getRoles());
+        if (registerRequest.getRoles() != null && !registerRequest.getRoles().isEmpty()) {
+            user.setRoles(registerRequest.getRoles());
+        } else {
+            user.getRoles().add(UserRole.EMPLOYEE);
+        }
         user.setDepartment(registerRequest.getDepartment());
         user.setManager(manager);
         user.setJoiningDate(registerRequest.getJoiningDate());
@@ -198,7 +226,11 @@ public class AuthService {
             user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
             user.setFullName(registerRequest.getFullName());
             user.setEmail(registerRequest.getEmail());
-            user.setRoles(registerRequest.getRoles());
+            if (registerRequest.getRoles() != null && !registerRequest.getRoles().isEmpty()) {
+                user.setRoles(registerRequest.getRoles());
+            } else {
+                user.getRoles().add(UserRole.EMPLOYEE);
+            }
             user.setDepartment(registerRequest.getDepartment());
             user.setManager(manager);
             user.setJoiningDate(registerRequest.getJoiningDate());
@@ -224,9 +256,14 @@ public class AuthService {
      */
     private void initializeLeaveBalances(User user) {
         List<LeavePolicy> policies = new ArrayList<>();
-        for (UserRole role : user.getRoles()) {
-            policies.addAll(leavePolicyRepository.findByApplicableRolesAndActive(role));
+
+        // Check if user has roles, if not, skip initialization
+        if (user.getRoles() != null && !user.getRoles().isEmpty()) {
+            for (UserRole role : user.getRoles()) {
+                policies.addAll(leavePolicyRepository.findByApplicableRolesAndActive(role));
+            }
         }
+
         int currentYear = LocalDateTime.now().getYear();
 
         for (LeavePolicy policy : policies) {
@@ -274,7 +311,7 @@ public class AuthService {
         user.setResetToken(resetToken);
         userRepository.save(user);
 
-        String resetLink = "http://localhost:5173/reset-password?token=" + resetToken;
+        String resetLink = frontendBaseUri + "/reset-password?token=" + resetToken;
         try {
             emailService.sendEmail(user.getEmail(), "Reset Password",
                     "Click the link to reset your password: " + resetLink);

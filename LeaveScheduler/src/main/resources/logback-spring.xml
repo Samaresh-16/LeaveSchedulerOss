@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <!-- Include Spring Boot defaults for color support and standard patterns -->
+  <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+  <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+
+  <!-- Suppress Syslog4j library warnings about multiple setters -->
+  <statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener">
+    <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+      <evaluator>
+        <matcher>
+          <Name>BeanDescriptionWarning</Name>
+          <regex>.*contains multiple setters.*</regex>
+        </matcher>
+        <expression>message.contains("multiple setters")</expression>
+      </evaluator>
+      <OnMatch>DENY</OnMatch>
+    </filter>
+  </statusListener>
+
+  <!-- SolarWinds Observability (Papertrail) Configuration -->
+  <springProperty scope="context" name="SWO_HOST" source="swo.host" defaultValue="syslog.collector.ap-01.cloud.solarwinds.com"/>
+  <springProperty scope="context" name="SWO_PORT" source="swo.port" defaultValue="6514"/>
+  <springProperty scope="context" name="SWO_TOKEN" source="swo.token"/>
+  <springProperty scope="context" name="APP_NAME" source="spring.application.name" defaultValue="LeaveScheduler"/>
+  
+  <!-- Define hostname with fallback -->
+  <conversionRule conversionWord="hostname" converterClass="ch.qos.logback.classic.pattern.SyslogStartConverter"/>
+  <property name="HOSTNAME" value="${HOSTNAME:-${COMPUTERNAME:-localhost}}"/>
+
+  <!-- Log Pattern for Syslog -->
+  <property name="SYSLOG_PATTERN" value="%d{MMM dd HH:mm:ss} ${HOSTNAME} ${APP_NAME}: %-5level %logger{30} - %msg [${SWO_TOKEN}@41058]%n%xEx"/>
+
+  <!-- Async Console Appender for better performance -->
+  <appender name="ASYNC_CONSOLE" class="ch.qos.logback.classic.AsyncAppender">
+    <queueSize>512</queueSize>
+    <discardingThreshold>0</discardingThreshold>
+    <appender-ref ref="CONSOLE"/>
+  </appender>
+
+  <!-- SolarWinds Observability Syslog Appender -->
+  <appender name="SYSLOG" class="com.papertrailapp.logback.Syslog4jAppender">
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>INFO</level>
+    </filter>
+    <layout class="ch.qos.logback.classic.PatternLayout">
+      <pattern>${SYSLOG_PATTERN}</pattern>
+    </layout>
+    <syslogConfig class="org.productivity.java.syslog4j.impl.net.tcp.ssl.SSLTCPNetSyslogConfig">
+      <host>${SWO_HOST}</host>
+      <port>${SWO_PORT}</port>
+      <maxMessageLength>128000</maxMessageLength>
+    </syslogConfig>
+  </appender>
+
+  <!-- Async Syslog Appender for non-blocking remote logging -->
+  <appender name="ASYNC_SYSLOG" class="ch.qos.logback.classic.AsyncAppender">
+    <queueSize>512</queueSize>
+    <discardingThreshold>80</discardingThreshold>
+    <neverBlock>true</neverBlock>
+    <appender-ref ref="SYSLOG"/>
+  </appender>
+
+  <!-- Application-specific loggers -->
+  <logger name="com.sap.fsad.leaveApp" level="INFO"/>
+  <logger name="org.springframework.web" level="INFO"/>
+  <logger name="org.springframework.security" level="INFO"/>
+  <logger name="org.hibernate" level="WARN"/>
+  <logger name="org.hibernate.SQL" level="INFO"/>
+  <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="WARN"/>
+
+  <!-- Root logger configuration -->
+  <root level="INFO">
+    <appender-ref ref="ASYNC_CONSOLE"/>
+    <appender-ref ref="ASYNC_SYSLOG"/>
+  </root>
+
+  <!-- Spring profiles for environment-specific configuration -->
+  <springProfile name="dev,local">
+    <logger name="com.sap.fsad.leaveApp" level="INFO"/>
+    <logger name="org.springframework.web" level="INFO"/>
+    <logger name="org.hibernate.SQL" level="INFO"/>
+    <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="INFO"/>
+  </springProfile>
+
+  <springProfile name="prod">
+    <logger name="org.hibernate.SQL" level="WARN"/>
+    <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="WARN"/>
+  </springProfile>
+
+</configuration>

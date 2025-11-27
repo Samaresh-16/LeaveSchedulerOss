@@ -1,25 +1,36 @@
 package com.sap.fsad.leaveApp.controller;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.sap.fsad.leaveApp.dto.request.LeavePolicyRequest;
 import com.sap.fsad.leaveApp.dto.request.UserUpdateRequest;
 import com.sap.fsad.leaveApp.dto.response.ApiResponse;
 import com.sap.fsad.leaveApp.dto.response.DashboardStatsResponse;
 import com.sap.fsad.leaveApp.dto.response.UserResponse;
+import com.sap.fsad.leaveApp.logging.LogOperation;
 import com.sap.fsad.leaveApp.model.LeavePolicy;
 import com.sap.fsad.leaveApp.model.enums.LeaveType;
 import com.sap.fsad.leaveApp.service.AdminService;
 import com.sap.fsad.leaveApp.service.LeaveCreditService;
 import com.sap.fsad.leaveApp.service.UserService;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -39,6 +50,7 @@ public class AdminController {
 
     @GetMapping("/dashboard-stats")
     @Operation(summary = "Get admin dashboard statistics")
+    @LogOperation(value = "VIEW_ADMIN_DASHBOARD", entityType = "Dashboard", includeResponseBody = false)
     public ResponseEntity<DashboardStatsResponse> getDashboardStats() {
         DashboardStatsResponse stats = adminService.getDashboardStats();
         return ResponseEntity.ok(stats);
@@ -46,6 +58,7 @@ public class AdminController {
 
     @GetMapping("/users")
     @Operation(summary = "Get all users")
+    @LogOperation(value = "VIEW_ALL_USERS", entityType = "User", includeResponseBody = false)
     public ResponseEntity<List<UserResponse>> getAllUsers() {
         List<UserResponse> users = adminService.getAllUsers();
         return ResponseEntity.ok(users);
@@ -53,6 +66,7 @@ public class AdminController {
 
     @PutMapping("/users/{userId}")
     @Operation(summary = "Update user details")
+    @LogOperation(value = "UPDATE_USER", entityType = "User", async = false)
     public ResponseEntity<UserResponse> updateUser(
             @PathVariable Long userId,
             @Valid @RequestBody UserUpdateRequest request) {
@@ -62,6 +76,7 @@ public class AdminController {
 
     @PostMapping("/leave-policies")
     @Operation(summary = "Create or update leave policy")
+    @LogOperation(value = "CREATE_OR_UPDATE_LEAVE_POLICY", entityType = "LeavePolicy", async = false)
     public ResponseEntity<LeavePolicy> createOrUpdateLeavePolicy(
             @Valid @RequestBody LeavePolicyRequest request) {
         LeavePolicy policy = adminService.createOrUpdateLeavePolicy(request);
@@ -70,6 +85,7 @@ public class AdminController {
 
     @GetMapping("/leave-policies")
     @Operation(summary = "Get all leave policies")
+    @LogOperation(value = "VIEW_ALL_LEAVE_POLICIES", entityType = "LeavePolicy", includeResponseBody = false)
     public ResponseEntity<List<LeavePolicy>> getAllLeavePolicies() {
         List<LeavePolicy> policies = adminService.getAllLeavePolicies();
         return ResponseEntity.ok(policies);
@@ -77,6 +93,7 @@ public class AdminController {
 
     @GetMapping("/leave-policies/{id}")
     @Operation(summary = "Get leave policy by ID")
+    @LogOperation(value = "VIEW_LEAVE_POLICY", entityType = "LeavePolicy")
     public ResponseEntity<LeavePolicy> getLeavePolicyById(@PathVariable Long id) {
         LeavePolicy policy = adminService.getLeavePolicyById(id);
         return ResponseEntity.ok(policy);
@@ -84,6 +101,7 @@ public class AdminController {
 
     @DeleteMapping("/leave-policies/{id}")
     @Operation(summary = "Delete leave policy")
+    @LogOperation(value = "DELETE_LEAVE_POLICY", entityType = "LeavePolicy", async = false)
     public ResponseEntity<ApiResponse> deleteLeavePolicy(@PathVariable Long id) {
         ApiResponse response = adminService.deleteLeavePolicy(id);
         return ResponseEntity.ok(response);
@@ -91,6 +109,7 @@ public class AdminController {
 
     @PostMapping("/credit-leaves")
     @Operation(summary = "Credit annual leaves to all users")
+    @LogOperation(value = "CREDIT_ANNUAL_LEAVES_ALL", entityType = "LeaveCredit", async = false)
     public ResponseEntity<ApiResponse> creditAnnualLeaveForAllUsers() {
         ApiResponse response = leaveCreditService.creditAnnualLeaveForAllUsers();
         return ResponseEntity.ok(response);
@@ -98,6 +117,7 @@ public class AdminController {
 
     @PostMapping("/credit-special-leave")
     @Operation(summary = "Credit special leave to specific users")
+    @LogOperation(value = "CREDIT_SPECIAL_LEAVE", entityType = "LeaveCredit", async = false)
     public ResponseEntity<List<ApiResponse>> creditSpecialLeave(
             @RequestParam List<Long> userIds,
             @RequestParam LeaveType leaveType,
@@ -110,6 +130,7 @@ public class AdminController {
     @GetMapping("/managed")
     @Operation(summary = "Get users managed by Specific Manager")
     @SecurityRequirement(name = "bearerAuth")
+    @LogOperation(value = "VIEW_MANAGED_USERS", entityType = "User", includeResponseBody = false)
     public ResponseEntity<List<UserResponse>> getManagedUsers(@RequestParam(required = false) Long managerId) {
         List<UserResponse> users = userService.getUsersByManagerId(managerId);
         return ResponseEntity.ok(users);

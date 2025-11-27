@@ -1,17 +1,27 @@
 package com.sap.fsad.leaveApp.service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.sap.fsad.leaveApp.dto.request.LeaveApplicationRequest;
-import com.sap.fsad.leaveApp.dto.response.LeaveResponse;
 import com.sap.fsad.leaveApp.dto.response.ApiResponse;
 import com.sap.fsad.leaveApp.dto.response.CalendarEventResponse;
 import com.sap.fsad.leaveApp.dto.response.LeaveBalanceResponse;
+import com.sap.fsad.leaveApp.dto.response.LeaveResponse;
 import com.sap.fsad.leaveApp.exception.BadRequestException;
 import com.sap.fsad.leaveApp.exception.ResourceNotFoundException;
 import com.sap.fsad.leaveApp.model.Holiday;
 import com.sap.fsad.leaveApp.model.LeaveApplication;
 import com.sap.fsad.leaveApp.model.LeaveBalance;
-import com.sap.fsad.leaveApp.model.User;
 import com.sap.fsad.leaveApp.model.LeavePolicy;
+import com.sap.fsad.leaveApp.model.User;
 import com.sap.fsad.leaveApp.model.enums.LeaveStatus;
 import com.sap.fsad.leaveApp.model.enums.LeaveType;
 import com.sap.fsad.leaveApp.repository.LeaveApplicationRepository;
@@ -19,16 +29,6 @@ import com.sap.fsad.leaveApp.repository.LeaveBalanceRepository;
 import com.sap.fsad.leaveApp.repository.LeavePolicyRepository;
 import com.sap.fsad.leaveApp.util.DateUtil;
 import com.sap.fsad.leaveApp.util.LeaveCalculator;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class LeaveService {
@@ -161,7 +161,6 @@ public class LeaveService {
         LeaveApplication savedApplication = leaveApplicationRepository.save(leaveApplication);
 
         // Notify manager
-
         notificationService.createLeaveApplicationNotification(manager, savedApplication);
         emailService.sendLeaveApplicationEmail(savedApplication);
 

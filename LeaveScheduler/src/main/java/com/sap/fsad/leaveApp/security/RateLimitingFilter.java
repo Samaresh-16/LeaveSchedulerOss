@@ -6,6 +6,7 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Component;
+import com.sap.fsad.leaveApp.exception.RateLimitExceededException;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -26,7 +27,7 @@ public class RateLimitingFilter implements Filter {
             response.getWriter().write("Too many requests. Please try again later.");
             response.setContentType("text/plain");
             response.setCharacterEncoding("UTF-8");
-            return;
+            throw new RateLimitExceededException("Too many requests from IP: " + clientIp);
         }
 
         chain.doFilter(request, response);
